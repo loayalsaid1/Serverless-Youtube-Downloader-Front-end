@@ -44,8 +44,10 @@ export function useDownloader() {
       // Send request via WebSocket
       ws.send({
         action: "requestVideo",
-        videoId,
-        format,
+        payload: {
+          videoId,
+          format,
+        }
       })
 
       toast.success("Download queued", {

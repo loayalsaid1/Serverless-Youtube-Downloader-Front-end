@@ -28,9 +28,11 @@ export interface WebSocketMessage {
 }
 
 export interface DownloadRequest {
-  action: "requestVideo"
-  videoId: string
-  format: DownloadFormat
+  action: "requestVideo",
+  payload: {
+    videoId: string
+    format: DownloadFormat
+  }
 }
 
 export interface Settings {
