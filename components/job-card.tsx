@@ -24,7 +24,7 @@ export function JobCard({ job }: JobCardProps) {
   }
 
   return (
-    <Card className="p-4">
+    <Card className={`p-4 ${job.isPending ? 'opacity-80' : ''}`}>
       <div className="flex gap-4">
         {/* Thumbnail */}
         {job.thumbnailUrl && (
@@ -33,8 +33,13 @@ export function JobCard({ job }: JobCardProps) {
               src={job.thumbnailUrl || "/placeholder.svg"}
               alt={job.videoTitle || "Video thumbnail"}
               fill
-              className="object-cover"
+              className={`object-cover ${job.isPending ? 'opacity-70' : ''}`}
             />
+            {job.isPending && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                <span className="text-xs text-white font-medium px-2 py-1 bg-black/40 rounded">Connecting...</span>
+              </div>
+            )}
           </div>
         )}
 

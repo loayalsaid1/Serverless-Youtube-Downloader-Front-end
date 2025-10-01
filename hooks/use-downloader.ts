@@ -25,17 +25,18 @@ export function useDownloader() {
     try {
       const ws = getWebSocketService()
 
-      // Generate job ID
-      const jobId = `${videoId}-${format}-${Date.now()}`
+      // Generate temporary ID for UI tracking
+      const tempId = `temp-${videoId}-${format}-${Date.now()}`
 
-      // Create job object
+      // Create temporary job object with PENDING status
       const job: Job = {
-        jobId,
+        jobId: tempId,
         videoId,
         format,
-        status: "QUEUED",
+        status: "PENDING", // Use PENDING until confirmed by server
         createdAt: new Date().toISOString(),
         thumbnailUrl: getYouTubeThumbnail(videoId),
+        isPending: true, // Flag to identify this is a pending job
       }
 
       // Save to local storage
@@ -50,8 +51,8 @@ export function useDownloader() {
         }
       })
 
-      toast.success("Download queued", {
-        description: `Your ${format.toUpperCase()} download has been queued`,
+      toast.success("Download request submitted", {
+        description: `Your ${format.toUpperCase()} download is being processed`,
       })
 
       return job

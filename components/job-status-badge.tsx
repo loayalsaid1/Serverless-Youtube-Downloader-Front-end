@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import { Clock, Loader2, CheckCircle2, XCircle } from "lucide-react"
+import { Clock, Loader2, CheckCircle2, XCircle, Hourglass } from "lucide-react"
 import type { JobStatus } from "@/lib/types"
 
 interface JobStatusBadgeProps {
@@ -7,6 +7,12 @@ interface JobStatusBadgeProps {
 }
 
 const statusConfig = {
+  PENDING: {
+    label: "Requesting",
+    variant: "secondary" as const,
+    icon: Hourglass,
+    className: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+  },
   QUEUED: {
     label: "Queued",
     variant: "secondary" as const,
