@@ -77,6 +77,7 @@ export function useJobQueue(lastMessage: WebSocketMessage | null) {
           updateJobStatus(payload.jobId, {
             status: payload.status,
             videoTitle: payload.videoTitle,
+            ...(payload.status === "COMPLETED" ? { downloadUrl: payload.fileUrl } : {}),
             error: payload.error,
           })
 
@@ -94,13 +95,19 @@ export function useJobQueue(lastMessage: WebSocketMessage | null) {
         break
 
       case "fileReady":
+        console.log("File ready message received:", payload)
         // File is ready for download
-        updateJobStatus(payload.jobId, {
-          status: "COMPLETED",
-          downloadUrl: payload.fileUrl,
-          videoTitle: payload.videoTitle,
-          completedAt: new Date().toISOString(),
-        })
+        // Get the pending job with format and videoId
+        const pendingJob = jobs.find(job => job.isPending && job.videoId === payload.videoId && job.format === payload.format)
+        if (pendingJob) {
+          updateJobStatus(pendingJob.jobId, {
+            status: "COMPLETED",
+            downloadUrl: payload.fileUrl,
+            videoTitle: payload.videoTitle,
+            completedAt: new Date().toISOString(),
+            isPending: false
+          })
+        }
 
         toast.success("Download ready!", {
           description: payload.videoTitle || "Your download is ready",
