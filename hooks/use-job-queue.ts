@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { toast } from "sonner"
 import { storageService } from "@/lib/storage"
+import { jobQueuedEventHandler } from "@/lib/jobQueued-event-handler"
 import { getYouTubeThumbnail } from "@/lib/validators"
 import type { Job, WebSocketMessage } from "@/lib/types"
 
@@ -25,49 +26,14 @@ export function useJobQueue(lastMessage: WebSocketMessage | null) {
       case "jobQueued":
         // Find any pending job with matching videoId and format
         if (payload.videoId && payload.format) {
-          setJobs(prevJobs => {
-            const pendingJobs = prevJobs.filter(
-              job => job.isPending && job.videoId === payload.videoId && job.format === payload.format
-            )
-            
-            if (pendingJobs.length > 0) {
-              // Update the pending job with the real jobId from server
-              const pendingJob = pendingJobs[0]
-              
-              // Create the confirmed job with server jobId
-              const confirmedJob: Job = {
-                ...pendingJob,
-                jobId: payload.jobId,
-                status: "QUEUED",
-                isPending: false
-              }
-              
-              // Update jobs list
-              const updatedJobs = prevJobs.map(job => 
-                job.jobId === pendingJob.jobId ? confirmedJob : job
-              )
-              
-              // Update in storage
-              storageService.saveJobs(updatedJobs)
-              
-              console.log(`Pending job updated with server jobId: ${payload.jobId}`)
-              return updatedJobs
-            } else {
-              // If no matching pending job (could happen on reconnect), create a new job
-              const newJob: Job = {
-                jobId: payload.jobId,
-                videoId: payload.videoId,
-                format: payload.format,
-                status: "QUEUED",
-                createdAt: payload.createdAt || new Date().toISOString(),
-                thumbnailUrl: getYouTubeThumbnail(payload.videoId)
-              }
-              
-              const updatedJobs = [newJob, ...prevJobs]
-              storageService.saveJobs(updatedJobs)
-              return updatedJobs
-            }
-          })
+          setJobs(prevJobs => 
+            jobQueuedEventHandler.handleJobQueued(prevJobs, {
+              jobId: payload.jobId,
+              videoId: payload.videoId!,
+              format: payload.format!,
+              createdAt: payload.createdAt
+            })
+          )
         }
         break
 
