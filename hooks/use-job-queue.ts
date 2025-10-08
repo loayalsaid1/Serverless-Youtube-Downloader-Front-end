@@ -1,14 +1,19 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { toast } from "sonner"
 import { storageService } from "@/lib/storage"
 import { jobQueuedEventHandler } from "@/lib/jobQueued-event-handler"
-import { getYouTubeThumbnail } from "@/lib/validators"
 import type { Job, WebSocketMessage } from "@/lib/types"
 
 export function useJobQueue(lastMessage: WebSocketMessage | null) {
   const [jobs, setJobs] = useState<Job[]>([])
+  const jobsRef = useRef<Job[]>([])
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    jobsRef.current = jobs
+  }, [jobs])
 
   // Load jobs from storage on mount
   useEffect(() => {
@@ -16,24 +21,32 @@ export function useJobQueue(lastMessage: WebSocketMessage | null) {
     setJobs(storedJobs)
   }, [])
 
+  // Handle job queued events
+  const handleJobQueued = useCallback(async (payload: { jobId: string; videoId: string; format: any; createdAt?: string }) => {
+    try {
+      const updatedJobs = await jobQueuedEventHandler.handleJobQueued(jobsRef.current, payload)
+      setJobs(updatedJobs)
+    } catch (error) {
+      console.error('Error handling job queued event:', error)
+    }
+  }, [])
+
   // Handle WebSocket messages
   useEffect(() => {
     if (!lastMessage) return
-
+ 
     const { type, payload } = lastMessage
 
     switch (type) {
       case "jobQueued":
         // Find any pending job with matching videoId and format
         if (payload.videoId && payload.format) {
-          setJobs(prevJobs => 
-            jobQueuedEventHandler.handleJobQueued(prevJobs, {
-              jobId: payload.jobId,
-              videoId: payload.videoId!,
-              format: payload.format!,
-              createdAt: payload.createdAt
-            })
-          )
+          handleJobQueued({
+            jobId: payload.jobId,
+            videoId: payload.videoId!,
+            format: payload.format!, 
+            createdAt: payload.createdAt
+          })
         }
         break
 
@@ -42,7 +55,6 @@ export function useJobQueue(lastMessage: WebSocketMessage | null) {
         if (payload.status) {
           updateJobStatus(payload.jobId, {
             status: payload.status,
-            videoTitle: payload.videoTitle,
             ...(payload.status === "COMPLETED" ? { downloadUrl: payload.fileUrl } : {}),
             error: payload.error,
           })
@@ -69,7 +81,6 @@ export function useJobQueue(lastMessage: WebSocketMessage | null) {
           updateJobStatus(pendingJob.jobId, {
             status: "COMPLETED",
             downloadUrl: payload.fileUrl,
-            videoTitle: payload.videoTitle,
             completedAt: new Date().toISOString(),
             isPending: false
           })
@@ -80,7 +91,7 @@ export function useJobQueue(lastMessage: WebSocketMessage | null) {
         })
         break
     }
-  }, [lastMessage])
+  }, [lastMessage, handleJobQueued])
 
   const updateJobStatus = useCallback((jobId: string, updates: Partial<Job>) => {
     setJobs((prevJobs) => {

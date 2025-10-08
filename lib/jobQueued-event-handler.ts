@@ -1,15 +1,15 @@
 import { storageService } from "./storage"
-import { getYouTubeThumbnail } from "./validators"
+import { fetchVideoTitle, getYouTubeThumbnail } from "./YT-utils"
 import type { Job, DownloadFormat } from "./types"
 
 export const jobQueuedEventHandler = {
   /**
    * Handles the jobQueued event - either updates a pending job or creates a new one
    */
-  handleJobQueued(
+  async handleJobQueued(
     currentJobs: Job[],
     payload: { jobId: string; videoId: string; format: DownloadFormat; createdAt?: string }
-  ): Job[] {
+  ): Promise<Job[]> {
     const { jobId, videoId, format } = payload
 
     // Try to find and update a pending job
@@ -21,7 +21,7 @@ export const jobQueuedEventHandler = {
     }
 
     // No pending job found, create a new one
-    const newJobs = this.createNewJob(currentJobs, payload)
+    const newJobs = await this.createNewJob(currentJobs, payload)
     storageService.saveJobs(newJobs)
     return newJobs
   },
@@ -52,17 +52,18 @@ export const jobQueuedEventHandler = {
   /**
    * Creates a new job when no pending job is found
    */
-  createNewJob(
+  async createNewJob(
     jobs: Job[],
     payload: { jobId: string; videoId: string; format: DownloadFormat; createdAt?: string }
-  ): Job[] {
+  ): Promise<Job[]> {
     const newJob: Job = {
       jobId: payload.jobId,
       videoId: payload.videoId,
       format: payload.format,
       status: "QUEUED",
       createdAt: payload.createdAt || new Date().toISOString(),
-      thumbnailUrl: getYouTubeThumbnail(payload.videoId)
+      thumbnailUrl: getYouTubeThumbnail(payload.videoId),
+      videoTitle: await fetchVideoTitle(payload.videoId) || undefined
     }
 
     return [newJob, ...jobs]

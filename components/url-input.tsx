@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { X, Check, AlertCircle } from "lucide-react"
-import { isValidYouTubeUrl } from "@/lib/validators"
+import { isValidYouTubeUrl } from "@/lib/YT-utils"
 
 interface UrlInputProps {
   value: string

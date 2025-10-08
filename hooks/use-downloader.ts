@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { toast } from "sonner"
-import { extractVideoId, getYouTubeThumbnail } from "@/lib/validators"
+import { extractVideoId, getYouTubeThumbnail, fetchVideoTitle } from "@/lib/YT-utils"
 import { storageService } from "@/lib/storage"
 import type { DownloadFormat, Job } from "@/lib/types"
 import { getWebSocketService } from "@/lib/websocket-service"
@@ -28,6 +28,8 @@ export function useDownloader() {
       // Generate temporary ID for UI tracking
       const tempId = `temp-${videoId}-${format}-${Date.now()}`
 
+      const videoTitle = await fetchVideoTitle(videoId)
+
       // Create temporary job object with PENDING status
       const job: Job = {
         jobId: tempId,
@@ -36,6 +38,7 @@ export function useDownloader() {
         status: "PENDING", // Use PENDING until confirmed by server
         createdAt: new Date().toISOString(),
         thumbnailUrl: getYouTubeThumbnail(videoId),
+        ...(videoTitle ? { videoTitle } : {}),
         isPending: true, // Flag to identify this is a pending job
       }
 
