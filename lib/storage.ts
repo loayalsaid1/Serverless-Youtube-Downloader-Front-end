@@ -52,7 +52,7 @@ export const storageService = {
 
   clearCompletedJobs(): void {
     const jobs = this.getJobs()
-    const activeJobs = jobs.filter((job) => job.status === "QUEUED" || job.status === "PROCESSING")
+    const activeJobs = jobs.filter((job) => job.status === "PENDING" || job.status === "QUEUED" || job.status === "PROCESSING")
     this.saveJobs(activeJobs)
   },
 
