@@ -7,6 +7,7 @@ import { JobQueue } from "@/components/job-queue"
 import { EmptyState } from "@/components/empty-state"
 import { useWebSocket } from "@/hooks/use-websocket"
 import { useJobQueue } from "@/hooks/use-job-queue"
+import { useUndoneJobsSync } from "@/hooks/use-undone-jobs-sync"
 
 // Replace with your actual WebSocket URL
 const WS_URL =
@@ -16,6 +17,9 @@ export default function Home() {
   const { isConnected, lastMessage } = useWebSocket(WS_URL)
   const { activeJobs, completedJobs, clearCompleted, refreshJobs } = useJobQueue(lastMessage)
   const [mounted, setMounted] = useState(false)
+
+  // Sync undone jobs when WebSocket connects (on mount/reload)
+  const { hasSynced } = useUndoneJobsSync(isConnected)
 
   useEffect(() => {
     setMounted(true)

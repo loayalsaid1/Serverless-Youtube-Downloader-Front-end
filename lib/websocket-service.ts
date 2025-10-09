@@ -108,8 +108,20 @@ class WebSocketService {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data))
       console.log("[v0] WebSocket message sent:", data)
+      
+      // Special logging for undone jobs sync
+      if (data.action === "requestVideo") {
+        console.log(`[v0] Requesting video updates for videoId: ${data.payload.videoId}, format: ${data.payload.format}`)
+      }
     } else {
       console.warn("[v0] WebSocket not connected, queuing job")
+      
+      // Don't queue requestVideo messages as they're for syncing existing jobs
+      if (data.action === "requestVideo") {
+        console.warn("[v0] Cannot sync undone job - WebSocket not connected:", data)
+        return
+      }
+      
       this.pendingJobs.push(data)
       this.connect()
     }

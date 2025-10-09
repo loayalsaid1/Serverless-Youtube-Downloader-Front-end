@@ -56,6 +56,11 @@ export const storageService = {
     this.saveJobs(activeJobs)
   },
 
+  getUndoneJobs(): Job[] {
+    const jobs = this.getJobs()
+    return jobs.filter((job) => job.status !== "COMPLETED" && job.status !== "FAILED")
+  },
+
   // Settings
   getSettings(): Settings {
     try {
