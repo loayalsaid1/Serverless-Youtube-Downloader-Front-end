@@ -33,20 +33,6 @@ export function JobQueue({ activeJobs, completedJobs, onClearCompleted }: JobQue
             </h2>
           </div>
           <div className="flex items-center gap-2">
-            {completedJobs.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onClearCompleted()
-                }}
-                className="gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-                Clear Completed
-              </Button>
-            )}
             {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
           </div>
         </CollapsibleTrigger>
@@ -67,7 +53,18 @@ export function JobQueue({ activeJobs, completedJobs, onClearCompleted }: JobQue
             {completedJobs.length > 0 && (
               <div className="space-y-2">
                 {activeJobs.length > 0 && <div className="border-t pt-3" />}
-                <h3 className="text-sm font-medium text-muted-foreground">Recent</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-medium text-muted-foreground">Recent</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onClearCompleted}
+                    className="gap-2 text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Clear Completed
+                  </Button>
+                </div>
                 {completedJobs.slice(0, 5).map((job) => (
                   <JobCard key={job.jobId} job={job} />
                 ))}
