@@ -32,10 +32,10 @@ export default function Home() {
   const hasJobs = activeJobs.length > 0 || completedJobs.length > 0
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header isConnected={isConnected} />
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-8 max-w-4xl flex-1">
         <div className="space-y-6">
           <DownloadForm onJobSubmitted={refreshJobs} />
 
@@ -47,7 +47,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="border-t mt-12 py-6">
+      <footer className="border-t py-6 mt-auto">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
           <p>Download YouTube videos in multiple formats. Built with Next.js and AWS WebSockets.</p>
         </div>
