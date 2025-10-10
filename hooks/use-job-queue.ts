@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { toast } from "sonner"
+import { enhancedToast } from "@/lib/enhanced-toasts"
 import { storageService } from "@/lib/storage"
 import { jobQueuedEventHandler } from "@/lib/jobQueued-event-handler"
 import type { Job, WebSocketMessage } from "@/lib/types"
@@ -61,12 +62,23 @@ export function useJobQueue(lastMessage: WebSocketMessage | null) {
 
           // Show notification for completed/failed jobs
           if (payload.status === "COMPLETED") {
-            toast.success("Download ready!", {
-              description: payload.videoTitle || "Your download is ready",
+            // Find the job to get additional info
+            const completedJob = jobsRef.current.find(job => job.jobId === payload.jobId)
+            enhancedToast.success("Download ready!", {
+              videoTitle: payload.videoTitle || completedJob?.videoTitle,
+              thumbnailUrl: payload.thumbnailUrl || completedJob?.thumbnailUrl,
+              format: completedJob?.format,
+              videoId: completedJob?.videoId
             })
           } else if (payload.status === "FAILED") {
-            toast.error("Download failed", {
-              description: payload.error || "Something went wrong",
+            // Find the job to get additional info
+            const failedJob = jobsRef.current.find(job => job.jobId === payload.jobId)
+            enhancedToast.error("Download failed", {
+              videoTitle: payload.videoTitle || failedJob?.videoTitle,
+              thumbnailUrl: payload.thumbnailUrl || failedJob?.thumbnailUrl,
+              format: failedJob?.format,
+              videoId: failedJob?.videoId,
+              error: payload.error || "Something went wrong"
             })
           }
         }
@@ -86,8 +98,11 @@ export function useJobQueue(lastMessage: WebSocketMessage | null) {
           })
         }
 
-        toast.success("Download ready!", {
-          description: payload.videoTitle || "Your download is ready",
+        enhancedToast.success("Download ready!", {
+          videoTitle: payload.videoTitle || pendingJob?.videoTitle,
+          thumbnailUrl: payload.thumbnailUrl || pendingJob?.thumbnailUrl,
+          format: pendingJob?.format,
+          videoId: pendingJob?.videoId
         })
         break
     }

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { toast } from "sonner"
+import { enhancedToast } from "@/lib/enhanced-toasts"
 import { extractVideoId, getYouTubeThumbnail, fetchVideoTitle } from "@/lib/YT-utils"
 import { storageService } from "@/lib/storage"
 import type { DownloadFormat, Job } from "@/lib/types"
@@ -54,15 +55,19 @@ export function useDownloader() {
         }
       })
 
-      toast.success("Download request submitted", {
-        description: `Your ${format.toUpperCase()} download is being processed`,
+      enhancedToast.success("Download request submitted", {
+        videoTitle: videoTitle || undefined,
+        thumbnailUrl: getYouTubeThumbnail(videoId),
+        format,
+        videoId
       })
 
       return job
     } catch (error) {
       console.error("[v0] Failed to submit download:", error)
-      toast.error("Failed to submit download", {
-        description: "Please check your connection and try again",
+      enhancedToast.error("Failed to submit download", {
+        error: "Please check your connection and try again",
+        format
       })
       return null
     } finally {
