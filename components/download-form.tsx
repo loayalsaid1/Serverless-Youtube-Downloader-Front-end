@@ -31,13 +31,13 @@ export function DownloadForm({ onJobSubmitted }: DownloadFormProps) {
   }
 
   return (
-    <Card className="p-6 space-y-6">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-balance">Download YouTube Videos</h2>
-        <p className="text-muted-foreground">Paste a YouTube URL and select your preferred format</p>
+    <Card className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="space-y-1 sm:space-y-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-balance">Download YouTube Videos</h2>
+        <p className="text-sm sm:text-base text-muted-foreground">Paste a YouTube URL and select your preferred format</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <UrlInput value={url} onChange={setUrl} onSubmit={handleSubmit} disabled={isSubmitting} />
 
         <FormatSelector value={format} onChange={setFormat} disabled={isSubmitting} />
@@ -45,10 +45,10 @@ export function DownloadForm({ onJobSubmitted }: DownloadFormProps) {
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting || !url.trim()}
-          className="w-full h-12 text-base"
+          className="w-full h-11 sm:h-12 text-sm sm:text-base"
           size="lg"
         >
-          <Download className="mr-2 h-5 w-5" />
+          <Download className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
           {isSubmitting ? "Submitting..." : "Download"}
         </Button>
       </div>

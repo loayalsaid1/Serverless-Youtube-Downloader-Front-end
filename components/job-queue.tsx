@@ -38,14 +38,16 @@ export function JobQueue({ activeJobs, completedJobs, onClearCompleted }: JobQue
         </CollapsibleTrigger>
 
         <CollapsibleContent>
-          <div className="p-4 pt-0 space-y-3">
+          <div className="p-3 sm:p-4 pt-0 space-y-2 sm:space-y-3">
             {/* Active Jobs */}
             {activeJobs.length > 0 && (
               <div className="space-y-2">
                 <h3 className="text-sm font-medium text-muted-foreground">Active</h3>
-                {activeJobs.map((job) => (
-                  <JobCard key={job.jobId} job={job} />
-                ))}
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-2 sm:gap-0 sm:space-y-2">
+                  {activeJobs.map((job) => (
+                    <JobCard key={job.jobId} job={job} />
+                  ))}
+                </div>
               </div>
             )}
 
@@ -59,15 +61,18 @@ export function JobQueue({ activeJobs, completedJobs, onClearCompleted }: JobQue
                     variant="ghost"
                     size="sm"
                     onClick={onClearCompleted}
-                    className="gap-2 text-muted-foreground hover:text-destructive"
+                    className="gap-2 text-muted-foreground hover:text-destructive text-xs sm:text-sm"
                   >
-                    <Trash2 className="h-4 w-4" />
-                    Clear Completed
+                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Clear Completed</span>
+                    <span className="sm:hidden">Clear</span>
                   </Button>
                 </div>
-                {completedJobs.slice(0, 5).map((job) => (
-                  <JobCard key={job.jobId} job={job} />
-                ))}
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-2 sm:gap-0 sm:space-y-2">
+                  {completedJobs.slice(0, 5).map((job) => (
+                    <JobCard key={job.jobId} job={job} />
+                  ))}
+                </div>
               </div>
             )}
           </div>

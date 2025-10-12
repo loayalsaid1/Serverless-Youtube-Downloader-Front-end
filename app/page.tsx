@@ -35,8 +35,8 @@ export default function Home() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header isConnected={isConnected} />
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl flex-1">
-        <div className="space-y-6">
+      <main className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl flex-1">
+        <div className="space-y-4 sm:space-y-6">
           <DownloadForm onJobSubmitted={refreshJobs} />
 
           {hasJobs ? (
