@@ -44,3 +44,16 @@ export function isValidYouTubeUrl(url: string): boolean {
 export function getYouTubeThumbnail(videoId: string): string {
   return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
 }
+
+export async function fetchVideoTitle(videoId: string): Promise<string | null> {
+  try { 
+    const response = await fetch (
+      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch%3Fv=${videoId}&format=json`
+    )
+    const data = await response.json()
+    return data.title || null
+  } catch (error) {
+    console.error("Failed to fetch video title:", error)
+    return null
+  }
+}

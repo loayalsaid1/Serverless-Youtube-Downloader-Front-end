@@ -1,6 +1,6 @@
 export type DownloadFormat = "mp4" | "mp3" | "txt" | "srt"
 
-export type JobStatus = "QUEUED" | "PROCESSING" | "COMPLETED" | "FAILED"
+export type JobStatus = "PENDING" | "QUEUED" | "PROCESSING" | "COMPLETED" | "FAILED"
 
 export interface Job {
   jobId: string
@@ -13,24 +13,30 @@ export interface Job {
   videoTitle?: string
   thumbnailUrl?: string
   error?: string
+  isPending?: boolean // Flag to identify temporary jobs waiting for server confirmation
 }
 
 export interface WebSocketMessage {
   type: "jobQueued" | "fileReady" | "jobStatusChanged"
   payload: {
     jobId: string
+    videoId?: string
+    format?: DownloadFormat
     fileUrl?: string
     status?: JobStatus
     videoTitle?: string
     thumbnailUrl?: string
     error?: string
+    createdAt?: string
   }
 }
 
 export interface DownloadRequest {
-  action: "requestVideo"
-  videoId: string
-  format: DownloadFormat
+  action: "requestVideo",
+  payload: {
+    videoId: string
+    format: DownloadFormat
+  }
 }
 
 export interface Settings {

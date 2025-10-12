@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react"
 import { toast } from "sonner"
-import { extractVideoId, getYouTubeThumbnail } from "@/lib/validators"
+import { enhancedToast } from "@/lib/enhanced-toasts"
+import { extractVideoId, getYouTubeThumbnail, fetchVideoTitle } from "@/lib/YT-utils"
 import { storageService } from "@/lib/storage"
 import type { DownloadFormat, Job } from "@/lib/types"
 import { getWebSocketService } from "@/lib/websocket-service"
@@ -25,17 +26,21 @@ export function useDownloader() {
     try {
       const ws = getWebSocketService()
 
-      // Generate job ID
-      const jobId = `${videoId}-${format}-${Date.now()}`
+      // Generate temporary ID for UI tracking
+      const tempId = `temp-${videoId}-${format}-${Date.now()}`
 
-      // Create job object
+      const videoTitle = await fetchVideoTitle(videoId)
+
+      // Create temporary job object with PENDING status
       const job: Job = {
-        jobId,
+        jobId: tempId,
         videoId,
         format,
-        status: "QUEUED",
+        status: "PENDING", // Use PENDING until confirmed by server
         createdAt: new Date().toISOString(),
         thumbnailUrl: getYouTubeThumbnail(videoId),
+        ...(videoTitle ? { videoTitle } : {}),
+        isPending: true, // Flag to identify this is a pending job
       }
 
       // Save to local storage
@@ -44,19 +49,25 @@ export function useDownloader() {
       // Send request via WebSocket
       ws.send({
         action: "requestVideo",
-        videoId,
-        format,
+        payload: {
+          videoId,
+          format,
+        }
       })
 
-      toast.success("Download queued", {
-        description: `Your ${format.toUpperCase()} download has been queued`,
+      enhancedToast.success("Download request submitted", {
+        videoTitle: videoTitle || undefined,
+        thumbnailUrl: getYouTubeThumbnail(videoId),
+        format,
+        videoId
       })
 
       return job
     } catch (error) {
       console.error("[v0] Failed to submit download:", error)
-      toast.error("Failed to submit download", {
-        description: "Please check your connection and try again",
+      enhancedToast.error("Failed to submit download", {
+        error: "Please check your connection and try again",
+        format
       })
       return null
     } finally {
