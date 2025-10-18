@@ -74,6 +74,7 @@ export const metadata: Metadata = {
     'msapplication-TileColor': '#000000',
     'msapplication-config': '/browserconfig.xml',
   },
+    generator: 'v0.app'
 }
 
 export default function RootLayout({
