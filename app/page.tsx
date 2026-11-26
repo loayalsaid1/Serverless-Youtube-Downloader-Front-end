@@ -5,6 +5,7 @@ import { Header } from "@/components/header"
 import { DownloadForm } from "@/components/download-form"
 import { JobQueue } from "@/components/job-queue"
 import { EmptyState } from "@/components/empty-state"
+import { ServiceStatusNotice } from "@/components/service-status-notice"
 import { useWebSocket } from "@/hooks/use-websocket"
 import { useJobQueue } from "@/hooks/use-job-queue"
 import { useUndoneJobsSync } from "@/hooks/use-undone-jobs-sync"
@@ -37,6 +38,7 @@ export default function Home() {
 
       <main className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl flex-1">
         <div className="space-y-4 sm:space-y-6">
+          <ServiceStatusNotice />
           <DownloadForm onJobSubmitted={refreshJobs} />
 
           {hasJobs ? (
