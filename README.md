@@ -106,7 +106,7 @@ The app expects WebSocket messages in the following format:
 
 ## Project Structure
 
-\`\`\`
+```
 ├── app/                    # Next.js app directory
 ├── components/             # React components
 │   ├── ui/                # shadcn/ui components
@@ -123,7 +123,7 @@ The app expects WebSocket messages in the following format:
 │   ├── validators.ts      # URL validation
 │   └── types.ts           # TypeScript types
 └── ...
-\`\`\`
+```
 
 ## Deployment
 
